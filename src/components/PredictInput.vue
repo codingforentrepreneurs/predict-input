@@ -3,6 +3,8 @@
         ref="foregroundInput"
         v-model="userDataModel" 
         @keyup="handleKeyUp"
+        @blur="handleBlur"
+        @focus="handleFocus"
         placeholder="Your input.."
         class="input-top"
         rows="10"
@@ -37,6 +39,27 @@ const handleKeyUp = (event) => {
     predDataModel.value = `${userDataModel.value} ${placeholder}`
     styleMatchBackground()
 }
+
+const toggleBackgroundInputTextDisplay = (on) => {
+    if (on) {
+        // show the text
+        backgroundInput.value.style.color = "gray";
+    } else {
+        // hide the text
+        backgroundInput.value.style.color = "transparent";
+    }
+}
+
+const handleBlur=(event)=>{
+    // user clicked away
+    toggleBackgroundInputTextDisplay(false)
+}
+
+const handleFocus=(event)=>{
+    // user clicked in
+    toggleBackgroundInputTextDisplay(true)
+}
+
 
 </script>
 
