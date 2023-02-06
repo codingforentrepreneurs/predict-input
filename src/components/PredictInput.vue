@@ -19,9 +19,10 @@
 import {ref, onMounted, defineEmits, defineProps} from 'vue'
 
 const emit = defineEmits(['didChange'])
-const props = defineProps(['name', 'predUrl'])
+const props = defineProps(['name', 'endpoint', 'skip-checks'])
 const foregroundInput = ref(null)
 const backgroundInput = ref(null)
+const endpointReady = ref(false)
 const userDataModel = ref("")
 const predDataModel = ref("")
 const predReqTimeout = ref(null)
@@ -37,9 +38,26 @@ const predictionSamples = [
 
 const predictedText = ref("")
 
-onMounted(()=>{
+onMounted(async ()=>{
     styleMatchBackground()
+    await checkEndpoint()
+    
 })
+
+const checkEndpoint = async () => {
+    if (props.endpoint) {
+        const response = await fetch(props.endpoint)
+        const contentType = response.headers.get('content-type')
+        if (response.ok) {
+            if (contentType === "json") {
+                console.log("ready")
+                endpointReady.value = true
+            } else {
+                console.log('not ready')
+            }
+        }
+    }
+}
 
 const styleMatchBackground = () => {
     backgroundInput.value.style.position = "absolute";
@@ -70,13 +88,15 @@ const requestPrediction = ()=> {
     clearTimeout(predReqTimeout.value)
     predReqTimeout.value = setTimeout(()=>{
         // this is our HTTP request
-        const randomIdx = Math.floor(Math.random() * predictionSamples.length)
-        const randomPredValue = predictionSamples[randomIdx]
-        predictedText.value = randomPredValue
-        if (userDataModel.value === "") {
-            predDataModel.value  = ""
-        } else {
-            predDataModel.value = `${userDataModel.value} ${randomPredValue}`
+        if (endpointReady.value) {
+            const randomIdx = Math.floor(Math.random() * predictionSamples.length)
+            const randomPredValue = predictionSamples[randomIdx]
+            predictedText.value = randomPredValue
+            if (userDataModel.value === "") {
+                predDataModel.value  = ""
+            } else {
+                predDataModel.value = `${userDataModel.value} ${randomPredValue}`
+            }
         }
     }, 500)
     
