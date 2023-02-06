@@ -3,6 +3,7 @@
         ref="foregroundInput"
         v-model="userDataModel" 
         @keyup="handleKeyUp"
+        @keydown.tab="handleTabPress"
         @blur="handleBlur"
         @focus="handleFocus"
         placeholder="Your input.."
@@ -19,7 +20,7 @@ const foregroundInput = ref(null)
 const backgroundInput = ref(null)
 const userDataModel = ref("")
 const predDataModel = ref("")
-const placeholder = "this is some of my pred text"
+const predictedText = ref("this is some of my pred text")
 
 onMounted(()=>{
     styleMatchBackground()
@@ -36,8 +37,19 @@ const styleMatchBackground = () => {
 }
 const handleKeyUp = (event) => {
     // predDataModel.value = event.target.value
-    predDataModel.value = `${userDataModel.value} ${placeholder}`
+    predDataModel.value = `${userDataModel.value} ${predictedText.value}`
     styleMatchBackground()
+}
+
+
+const handleTabPress = (event) => {
+    event.preventDefault()
+    userDataModel.value = `${userDataModel.value} ${predictedText.value}`
+    resetPredDataModel()
+}
+
+const resetPredDataModel = () => {
+    predDataModel.value = userDataModel.value
 }
 
 const toggleBackgroundInputTextDisplay = (on) => {
