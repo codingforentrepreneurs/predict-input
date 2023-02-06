@@ -5,8 +5,9 @@
         @keyup="handleKeyUp"
         placeholder="Your input.."
         class="input-top"
+        rows="10"
         ></textarea>
-    <textarea ref="backgroundInput" v-model="predDataModel"  class="input-bottom" readonly></textarea>
+    <textarea ref="backgroundInput" v-model="predDataModel"  class="input-bottom" readonly rows="10"></textarea>
 </template>
 
 <script setup>
@@ -16,6 +17,7 @@ const foregroundInput = ref(null)
 const backgroundInput = ref(null)
 const userDataModel = ref("")
 const predDataModel = ref("")
+const placeholder = "this is some of my pred text"
 
 onMounted(()=>{
     styleMatchBackground()
@@ -24,7 +26,7 @@ onMounted(()=>{
 const styleMatchBackground = () => {
     backgroundInput.value.style.position = "absolute";
     backgroundInput.value.style.borderColor = "transparent";
-    // backgroundInput.value.style.color = "transparent";
+    // backgroundInput.value.style.color = "gray";
     backgroundInput.value.style.top = foregroundInput.value.offsetTop + "px";
     backgroundInput.value.style.left = foregroundInput.value.offsetLeft + "px";
     backgroundInput.value.style.width = foregroundInput.value.offsetWidth + "px";
@@ -32,7 +34,7 @@ const styleMatchBackground = () => {
 }
 const handleKeyUp = (event) => {
     // predDataModel.value = event.target.value
-    predDataModel.value = userDataModel.value
+    predDataModel.value = `${userDataModel.value} ${placeholder}`
     styleMatchBackground()
 }
 
