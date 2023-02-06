@@ -3,6 +3,7 @@
         ref="foregroundInput"
         v-model="userDataModel" 
         @keyup="handleKeyUp"
+        @keydown="handleKeyDown"
         @keydown.tab="handleTabPress"
         @blur="handleBlur"
         @focus="handleFocus"
@@ -20,6 +21,7 @@ const foregroundInput = ref(null)
 const backgroundInput = ref(null)
 const userDataModel = ref("")
 const predDataModel = ref("")
+const predReqTimeout = ref(null)
 const predictionSamples = [
     "this is cool",
     "ready",
@@ -45,21 +47,31 @@ const styleMatchBackground = () => {
     backgroundInput.value.style.width = foregroundInput.value.offsetWidth + "px";
     backgroundInput.value.style.height = foregroundInput.value.offsetHeight + "px";
 }
+
+const handleKeyDown = event => {
+    predDataModel.value = `${userDataModel.value}`
+}
+
 const handleKeyUp = (event) => {
     // predDataModel.value = event.target.value
+    
     requestPrediction()
     styleMatchBackground()
 }
 
 const requestPrediction = ()=> {
-    const randomIdx = Math.floor(Math.random() * predictionSamples.length)
-    const randomPredValue = predictionSamples[randomIdx]
-    predictedText.value = randomPredValue
-    if (userDataModel.value === "") {
-        predDataModel.value  = ""
-    } else {
-        predDataModel.value = `${userDataModel.value} ${randomPredValue}`
-    }
+    clearTimeout(predReqTimeout.value)
+    predReqTimeout.value = setTimeout(()=>{
+        // this is our HTTP request
+        const randomIdx = Math.floor(Math.random() * predictionSamples.length)
+        const randomPredValue = predictionSamples[randomIdx]
+        predictedText.value = randomPredValue
+        if (userDataModel.value === "") {
+            predDataModel.value  = ""
+        } else {
+            predDataModel.value = `${userDataModel.value} ${randomPredValue}`
+        }
+    }, 500)
     
 }
 
