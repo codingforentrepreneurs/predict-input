@@ -1,5 +1,6 @@
 <template>
     <textarea 
+        :name="props.name"
         ref="foregroundInput"
         v-model="userDataModel" 
         @keyup="handleKeyUp"
@@ -15,8 +16,10 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, defineEmits, defineProps} from 'vue'
 
+const emit = defineEmits(['didChange'])
+const props = defineProps(['name', 'predUrl'])
 const foregroundInput = ref(null)
 const backgroundInput = ref(null)
 const userDataModel = ref("")
@@ -57,6 +60,10 @@ const handleKeyUp = (event) => {
     
     requestPrediction()
     styleMatchBackground()
+    emit('didChange', {
+        "value": userDataModel.value,
+        "prediction": predictedText.value
+    })
 }
 
 const requestPrediction = ()=> {

@@ -1,10 +1,9 @@
 <script setup>
-import PredictInput from './components/PredictInput.vue'
-import HelloWorld from './components/HelloWorld.vue'
+import Form from './components/Form.vue'
 </script>
 
 <template>
-  <PredictInput />
+  <Form />
 </template>
 
 <style scoped>
