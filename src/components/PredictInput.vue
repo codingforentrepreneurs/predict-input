@@ -20,7 +20,17 @@ const foregroundInput = ref(null)
 const backgroundInput = ref(null)
 const userDataModel = ref("")
 const predDataModel = ref("")
-const predictedText = ref("this is some of my pred text")
+const predictionSamples = [
+    "this is cool",
+    "ready",
+    "let's do this",
+    "nice work",
+    "neat",
+    "I like what you did there",
+    "random is fun"
+] 
+
+const predictedText = ref("")
 
 onMounted(()=>{
     styleMatchBackground()
@@ -37,8 +47,20 @@ const styleMatchBackground = () => {
 }
 const handleKeyUp = (event) => {
     // predDataModel.value = event.target.value
-    predDataModel.value = `${userDataModel.value} ${predictedText.value}`
+    requestPrediction()
     styleMatchBackground()
+}
+
+const requestPrediction = ()=> {
+    const randomIdx = Math.floor(Math.random() * predictionSamples.length)
+    const randomPredValue = predictionSamples[randomIdx]
+    predictedText.value = randomPredValue
+    if (userDataModel.value === "") {
+        predDataModel.value  = ""
+    } else {
+        predDataModel.value = `${userDataModel.value} ${randomPredValue}`
+    }
+    
 }
 
 
