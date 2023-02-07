@@ -1,6 +1,6 @@
 <template>
     <form ref="formRef" @submit="handleSubmit">
-        <predict-input name="content" endpoint="/my/api/endpoint/"></predict-input>
+        <predict-input name="content" check-endpoint="https://httpbin.org/json" endpoint="https://httpbin.org/json"></predict-input>
 
         <button type="submit">Send</button>
     </form>

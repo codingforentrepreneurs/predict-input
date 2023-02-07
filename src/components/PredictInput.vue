@@ -19,7 +19,7 @@
 import {ref, onMounted, defineEmits, defineProps} from 'vue'
 
 const emit = defineEmits(['didChange'])
-const props = defineProps(['name', 'endpoint', 'skip-checks'])
+const props = defineProps(['name', 'endpoint', 'check-endpoint', 'skip-checks'])
 const foregroundInput = ref(null)
 const backgroundInput = ref(null)
 const endpointReady = ref(false)
@@ -37,6 +37,9 @@ const predictionSamples = [
 ] 
 
 const predictedText = ref("")
+const predEndpointErrorMaxCount = ref(5)
+const predEndpointErrorCurrentCount = ref(0)
+
 
 onMounted(async ()=>{
     styleMatchBackground()
@@ -45,17 +48,25 @@ onMounted(async ()=>{
 })
 
 const checkEndpoint = async () => {
-    if (props.endpoint) {
-        const response = await fetch(props.endpoint)
-        const contentType = response.headers.get('content-type')
-        if (response.ok) {
-            if (contentType === "json") {
-                console.log("ready")
-                endpointReady.value = true
-            } else {
-                console.log('not ready')
-            }
+    if (props.endpoint && props.checkEndpoint) {
+        const response = await fetch(props.checkEndpoint)
+        try {
+            await response.json()
+            endpointReady.value = true
+            predEndpointErrorCurrentCount.value  = 0
+            console.log('ready')
+        } catch (error) {
+            console.log('not ready')
         }
+        // const contentType = response.headers.get('content-type')
+        // if (response.ok) {
+        //     if (contentType === "json") {
+        //         console.log("ready")
+        //         endpointReady.value = true
+        //     } else {
+        //         console.log('not ready')
+        //     }
+        // }
     }
 }
 
@@ -86,16 +97,36 @@ const handleKeyUp = (event) => {
 
 const requestPrediction = ()=> {
     clearTimeout(predReqTimeout.value)
-    predReqTimeout.value = setTimeout(()=>{
+    predReqTimeout.value = setTimeout(async ()=>{
         // this is our HTTP request
-        if (endpointReady.value) {
+        if (endpointReady.value && props.endpoint) {
             const randomIdx = Math.floor(Math.random() * predictionSamples.length)
             const randomPredValue = predictionSamples[randomIdx]
-            predictedText.value = randomPredValue
-            if (userDataModel.value === "") {
-                predDataModel.value  = ""
-            } else {
+            const response = await fetch(props.endpoint,
+            { 
+                method: "POST",
+                headers: {
+                    "ContentType": "application/json"
+                },
+                body: JSON.stringify({
+                    "content": userDataModel.value,
+                    "prediction": randomPredValue
+                })
+            }
+            ) // POST
+            try {
+                const jsonData = await response.json()
+                console.log(jsonData)
+                const pred = jsonData.json.prediction
+                predictedText.value = pred
                 predDataModel.value = `${userDataModel.value} ${randomPredValue}`
+            } catch (error) {
+                predEndpointErrorCurrentCount.value ++
+                predDataModel.value  = ""
+            
+                if (predEndpointErrorCurrentCount.value > predEndpointErrorMaxCount.value - 1) {
+                    await checkEndpoint()
+                }
             }
         }
     }, 500)
