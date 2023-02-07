@@ -1,7 +1,7 @@
 # predict-input 
 Learn how to build a predict-input with Vue.js. A predict-input is an inline typeahead with tab completion designed to integrate with a predictive API.
 
-![Sample predict-input](./repo/predict-input-sample.gif)
+![Sample predict-input](./repo/predict-input-demo.gif)
 
 
 ## Course
